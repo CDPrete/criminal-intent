@@ -15,6 +15,7 @@ import android.widget.EditText;
 
 import com.bignerdranch.android.criminalintent.R;
 import com.bignerdranch.android.criminalintent.model.Crime;
+import com.bignerdranch.android.criminalintent.utils.DateUtils;
 
 /**
  * @author Cosimo Damiano Prete
@@ -53,7 +54,7 @@ public class CrimeFragment extends Fragment {
         });
 
         mDateButton = (Button) view.findViewById(R.id.crime_date);
-        mDateButton.setText(mCrime.getDate().toString());
+        mDateButton.setText(DateUtils.format(mCrime.getDate()));
         mDateButton.setEnabled(false);
 
         mSolvedCheckbox = (CheckBox) view.findViewById(R.id.crime_solved);
