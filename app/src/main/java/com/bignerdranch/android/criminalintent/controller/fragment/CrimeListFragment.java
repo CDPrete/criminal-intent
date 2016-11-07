@@ -70,7 +70,6 @@ public class CrimeListFragment extends Fragment {
         } else {
             if(crimePosition != NO_CRIME_SELECTED) {
                 mCrimeAdapter.notifyItemChanged(crimePosition);
-                crimePosition = NO_CRIME_SELECTED;
             } else {
                 mCrimeAdapter.notifyDataSetChanged();
             }
