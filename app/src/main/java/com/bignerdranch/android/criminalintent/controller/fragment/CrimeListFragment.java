@@ -1,5 +1,7 @@
 package com.bignerdranch.android.criminalintent.controller.fragment;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -23,6 +25,9 @@ import java.util.List;
  */
 
 public class CrimeListFragment extends Fragment {
+    private static final int NO_CRIME_SELECTED = -1;
+    private static final int REQUEST_CRIME = 1;
+
     private RecyclerView mCrimeRecyclerView;
     private CrimeAdapter mCrimeAdapter;
 
@@ -33,19 +38,29 @@ public class CrimeListFragment extends Fragment {
         mCrimeRecyclerView = (RecyclerView) view.findViewById(R.id.crime_recycler_view);
         mCrimeRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        updateUI();
-
         return view;
     }
 
     @Override
     public void onResume() {
         super.onResume();
-
         updateUI();
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(resultCode == Activity.RESULT_OK && requestCode == REQUEST_CRIME) {
+            updateUI(CrimeFragment.getCrimePositionFromData(data, NO_CRIME_SELECTED));
+        }
+    }
+
     private void updateUI() {
+        updateUI(NO_CRIME_SELECTED);
+    }
+
+    private void updateUI(int crimePosition) {
         CrimeLab crimeLab = CrimeLab.getInstance(getActivity());
         List<Crime> crimes = crimeLab.getCrimes();
 
@@ -53,7 +68,12 @@ public class CrimeListFragment extends Fragment {
             mCrimeAdapter = new CrimeAdapter(crimes);
             mCrimeRecyclerView.setAdapter(mCrimeAdapter);
         } else {
-            mCrimeAdapter.notifyDataSetChanged();
+            if(crimePosition != NO_CRIME_SELECTED) {
+                mCrimeAdapter.notifyItemChanged(crimePosition);
+                crimePosition = NO_CRIME_SELECTED;
+            } else {
+                mCrimeAdapter.notifyDataSetChanged();
+            }
         }
     }
 
@@ -63,6 +83,7 @@ public class CrimeListFragment extends Fragment {
         private CheckBox mCrimeSolvedCheckBox;
 
         private Crime mCrime;
+        private int mCrimePosition;
 
         public CrimeHolder(View itemView) {
             super(itemView);
@@ -74,8 +95,9 @@ public class CrimeListFragment extends Fragment {
             mCrimeSolvedCheckBox = (CheckBox) itemView.findViewById(R.id.list_item_crime_solved_check_box);
         }
 
-        public void bindCrime(Crime crime) {
+        public void bindCrime(Crime crime, int crimePosition) {
             mCrime = crime;
+            mCrimePosition = crimePosition;
 
             mCrimeTitleTextView.setText(mCrime.getTitle());
             mCrimeDateTextView.setText(mCrime.getDate().toString());
@@ -84,7 +106,9 @@ public class CrimeListFragment extends Fragment {
 
         @Override
         public void onClick(View view) {
-            startActivity(CrimeActivity.newIntent(getActivity(), mCrime.getId()));
+            startActivityForResult(
+                    CrimeActivity.newIntent(getActivity(), mCrimePosition),
+                    REQUEST_CRIME);
         }
     }
 
@@ -105,7 +129,7 @@ public class CrimeListFragment extends Fragment {
         @Override
         public void onBindViewHolder(CrimeHolder holder, int position) {
             Crime crime = mCrimes.get(position);
-            holder.bindCrime(crime);
+            holder.bindCrime(crime, position);
         }
 
         @Override

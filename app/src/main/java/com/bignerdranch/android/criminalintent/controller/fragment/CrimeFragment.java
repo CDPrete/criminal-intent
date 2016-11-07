@@ -1,6 +1,8 @@
 package com.bignerdranch.android.criminalintent.controller.fragment;
 
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
@@ -17,15 +19,15 @@ import com.bignerdranch.android.criminalintent.R;
 import com.bignerdranch.android.criminalintent.model.Crime;
 import com.bignerdranch.android.criminalintent.model.CrimeLab;
 
-import java.util.UUID;
-
 /**
  * @author Cosimo Damiano Prete
  * @since 30/10/2016
  */
 
 public class CrimeFragment extends Fragment {
-    private static final String ARG_CRIME_ID = "crime_id";
+    private static final String ARG_CRIME_POSITION = "crime_position";
+    private static final String EXTRA_CRIME_POSITION =
+                                    CrimeFragment.class.getPackage().toString() + ".crime_position";
 
     private EditText mTitleField;
     private Button mDateButton;
@@ -33,9 +35,9 @@ public class CrimeFragment extends Fragment {
 
     private Crime mCrime;
 
-    public static CrimeFragment newInstance(UUID crimeId) {
+    public static CrimeFragment newInstance(int crimePosition) {
         Bundle args = new Bundle();
-        args.putSerializable(ARG_CRIME_ID, crimeId);
+        args.putInt(ARG_CRIME_POSITION, crimePosition);
 
         CrimeFragment crimeFragment = new CrimeFragment();
         crimeFragment.setArguments(args);
@@ -47,8 +49,10 @@ public class CrimeFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mCrime = CrimeLab.getInstance(getActivity()).getCrime((UUID)
-                getArguments().getSerializable(ARG_CRIME_ID));
+        int crimePosition = getArguments().getInt(ARG_CRIME_POSITION);
+        mCrime = CrimeLab.getInstance(getActivity()).getCrimes().get(crimePosition);
+
+        sendResult(crimePosition);
     }
 
     @Override
@@ -84,5 +88,15 @@ public class CrimeFragment extends Fragment {
         });
 
         return view;
+    }
+
+    public static int getCrimePositionFromData(Intent data, int defaultValue) {
+        return data.getIntExtra(EXTRA_CRIME_POSITION, 0);
+    }
+
+    private void sendResult(int crimePosition) {
+        Intent i = new Intent();
+        i.putExtra(EXTRA_CRIME_POSITION, crimePosition);
+        getActivity().setResult(Activity.RESULT_OK, i);
     }
 }
