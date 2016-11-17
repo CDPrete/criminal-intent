@@ -11,7 +11,7 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 
 import com.bignerdranch.android.criminalintent.R;
-import com.bignerdranch.android.criminalintent.controller.CrimeActivity;
+import com.bignerdranch.android.criminalintent.controller.CrimePagerActivity;
 import com.bignerdranch.android.criminalintent.model.Crime;
 import com.bignerdranch.android.criminalintent.model.CrimeLab;
 
@@ -84,7 +84,7 @@ public class CrimeListFragment extends Fragment {
 
         @Override
         public void onClick(View view) {
-            startActivity(CrimeActivity.newIntent(getActivity(), mCrime.getId()));
+            startActivity(CrimePagerActivity.newIntent(getActivity(), mCrime.getId()));
         }
     }
 
