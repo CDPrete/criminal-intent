@@ -32,8 +32,10 @@ import java.util.UUID;
 public class CrimeFragment extends Fragment {
     private static final String ARG_CRIME_ID = "crime_id";
     private static final String DATE_PICKER_TAG = "crime_date_picker";
+    private static final String CRIME_CANCELLATION_CONFIRMATION_TAG = "confirm_crime_cancellation";
 
     private static final int REQUEST_DATE = 0;
+    private static final int REQUEST_CRIME_CANCELLATION = 1;
 
     private Button mDateButton;
 
@@ -112,9 +114,12 @@ public class CrimeFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.delete_crime_menu_item:
-                Activity parent = getActivity();
-                CrimeLab.getInstance(parent).removeCrime(mCrime);
-                parent.finish();
+                ConfirmationDialogFragment confirmation = ConfirmationDialogFragment
+                                                                    .newInstance(
+                                                                            R.string.delete_crime,
+                                                                            R.string.delete_crime_confirmation);
+                confirmation.setTargetFragment(CrimeFragment.this, REQUEST_CRIME_CANCELLATION);
+                confirmation.show(getFragmentManager(), CRIME_CANCELLATION_CONFIRMATION_TAG);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -123,9 +128,19 @@ public class CrimeFragment extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode == REQUEST_DATE && resultCode == Activity.RESULT_OK) {
-            mCrime.setDate(DatePickerFragment.getExtraCrimeDate(data));
-            updateDate();
+        if(resultCode == Activity.RESULT_OK) {
+            switch (requestCode) {
+                case REQUEST_DATE:
+                    mCrime.setDate(DatePickerFragment.getExtraCrimeDate(data));
+                    updateDate();
+                    break;
+                case REQUEST_CRIME_CANCELLATION:
+                    Activity parent = getActivity();
+                    CrimeLab.getInstance(parent).removeCrime(mCrime);
+                    parent.finish();
+                    break;
+            }
+
         }
     }
 

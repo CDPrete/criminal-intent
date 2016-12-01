@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="no_enough_params_dialog_creation">The title and/or the text of the dialog has not been specified.</string>
+    <string name="no_target_fragment">No target fragment specified. You have to specify a target fragment for the dialog.</string>
+</resources>
