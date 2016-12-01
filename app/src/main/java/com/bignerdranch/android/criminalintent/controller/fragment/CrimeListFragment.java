@@ -1,5 +1,6 @@
 package com.bignerdranch.android.criminalintent.controller.fragment;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -12,7 +13,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bignerdranch.android.criminalintent.R;
@@ -35,6 +38,8 @@ public class CrimeListFragment extends Fragment {
 
     private boolean mIsSubtitleVisible;
 
+    private LinearLayout mNoCrimesPanel;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,11 +53,24 @@ public class CrimeListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup group, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_crime_list, group, false);
+        Activity parent = getActivity();
+
+        mNoCrimesPanel = (LinearLayout) view.findViewById(R.id.no_crimes_panel);
 
         mCrimeRecyclerView = (RecyclerView) view.findViewById(R.id.crime_recycler_view);
-        mCrimeRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mCrimeRecyclerView.setLayoutManager(new LinearLayoutManager(parent));
 
         updateUI();
+
+        if(mNoCrimesPanel.getVisibility() == View.VISIBLE) {
+            Button addNewCrimeButton = (Button) mNoCrimesPanel.findViewById(R.id.new_crime_button);
+            addNewCrimeButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    addNewEmptyCrime();
+                }
+            });
+        }
 
         return view;
     }
@@ -74,9 +92,7 @@ public class CrimeListFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_item_new_crime:
-                Crime newCrime = new Crime();
-                CrimeLab.getInstance(getActivity()).addCrime(newCrime);
-                startActivity(CrimePagerActivity.newIntent(getActivity(), newCrime.getId()));
+                addNewEmptyCrime();
                 return true;
             case R.id.menu_item_show_subtitle:
                 mIsSubtitleVisible = !mIsSubtitleVisible;
@@ -86,6 +102,12 @@ public class CrimeListFragment extends Fragment {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void addNewEmptyCrime() {
+        Crime newCrime = new Crime();
+        CrimeLab.getInstance(getActivity()).addCrime(newCrime);
+        startActivity(CrimePagerActivity.newIntent(getActivity(), newCrime.getId()));
     }
 
     @Override
@@ -112,6 +134,8 @@ public class CrimeListFragment extends Fragment {
         }
 
         updateSubtitle();
+
+        mNoCrimesPanel.setVisibility(crimes.isEmpty() ? View.VISIBLE : View.GONE);
     }
 
     private void updateSubtitle() {
