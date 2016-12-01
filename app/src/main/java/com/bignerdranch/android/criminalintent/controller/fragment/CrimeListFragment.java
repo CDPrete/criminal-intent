@@ -116,12 +116,10 @@ public class CrimeListFragment extends Fragment {
 
     private void updateSubtitle() {
         AppCompatActivity parent = (AppCompatActivity) getActivity();
-        String subtitle =
-                getString(
-                        R.string.subtitle_format,
-                        CrimeLab.getInstance(parent).getCrimes().size());
-        if(!mIsSubtitleVisible) {
-            subtitle = null;
+        int numberOfCrimes = CrimeLab.getInstance(parent).getCrimes().size();
+        String subtitle = null;
+        if(mIsSubtitleVisible) {
+            subtitle = getResources().getQuantityString(R.plurals.subtitle_format, numberOfCrimes, numberOfCrimes);
         }
         parent.getSupportActionBar().setSubtitle(subtitle);
     }
