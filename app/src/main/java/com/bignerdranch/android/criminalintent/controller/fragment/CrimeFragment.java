@@ -32,9 +32,7 @@ public class CrimeFragment extends Fragment {
 
     private static final int REQUEST_DATE = 0;
 
-    private EditText mTitleField;
     private Button mDateButton;
-    private CheckBox mSolvedCheckbox;
 
     private Crime mCrime;
 
@@ -60,7 +58,7 @@ public class CrimeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup group, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_crime, group, false);
 
-        mTitleField = (EditText) view.findViewById(R.id.crime_title);
+        EditText mTitleField = (EditText) view.findViewById(R.id.crime_title);
         mTitleField.setText(mCrime.getTitle());
         mTitleField.addTextChangedListener(new TextWatcher() {
             @Override
@@ -86,7 +84,7 @@ public class CrimeFragment extends Fragment {
         });
         updateDate();
 
-        mSolvedCheckbox = (CheckBox) view.findViewById(R.id.crime_solved);
+        CheckBox mSolvedCheckbox = (CheckBox) view.findViewById(R.id.crime_solved);
         mSolvedCheckbox.setChecked(mCrime.isSolved());
         mSolvedCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
