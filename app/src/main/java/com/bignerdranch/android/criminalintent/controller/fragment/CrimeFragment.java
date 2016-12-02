@@ -108,7 +108,9 @@ public class CrimeFragment extends Fragment {
     public void onPause() {
         super.onPause();
 
-        CrimeLab.getInstance(getActivity().getApplication()).updateCrime(mCrime);
+        if(mCrime != null) {
+            CrimeLab.getInstance(getActivity().getApplication()).updateCrime(mCrime);
+        }
     }
 
     @Override
@@ -145,6 +147,7 @@ public class CrimeFragment extends Fragment {
                 case REQUEST_CRIME_CANCELLATION:
                     Activity parent = getActivity();
                     CrimeLab.getInstance(parent.getApplication()).removeCrime(mCrime);
+                    mCrime = null;
                     parent.finish();
                     break;
             }

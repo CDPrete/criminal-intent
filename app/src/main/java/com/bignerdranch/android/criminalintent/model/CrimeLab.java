@@ -92,6 +92,6 @@ public class CrimeLab {
     }
 
     public void removeCrime(Crime crime) {
-        mCrimes.remove(crime);
+        mCrimeDao.delete(getCrimeEntity(crime.getId()));
     }
 }
