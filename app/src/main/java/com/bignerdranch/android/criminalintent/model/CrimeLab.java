@@ -75,6 +75,7 @@ public class CrimeLab {
             crime.setTitle(crimeEntity.getTitle());
             crime.setId(UUID.fromString(crimeEntity.getUuid()));
             crime.setSolved(crimeEntity.getSolved());
+            crime.setSuspect(crimeEntity.getSuspect());
         }
         return crime;
     }
@@ -87,6 +88,7 @@ public class CrimeLab {
             crimeEntity.setTitle(crime.getTitle());
             crimeEntity.setUuid(crime.getId().toString());
             crimeEntity.setDate(crime.getDate());
+            crimeEntity.setSuspect(crime.getSuspect());
         }
         return crimeEntity;
     }

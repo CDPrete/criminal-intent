@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:tools="http://schemas.android.com/tools"
               android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="match_parent">
@@ -34,7 +33,8 @@
         android:layout_marginStart="16dp"
         android:layout_marginLeft="16dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginRight="16dp">
+        android:layout_marginRight="16dp"
+        >
 
         <Button
             android:id="@+id/crime_date"
@@ -50,13 +50,29 @@
             android:text="@string/crime_solved_label"/>
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/list_item_crime_crime_id"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:padding="16dp"
-        tools:text="Crime UUID"
-        tools:visibility="visible"/>
+        android:orientation="horizontal"
+        android:layout_marginStart="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginEnd="16dp">
+
+        <Button
+            android:id="@+id/choose_crime_suspect"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/crime_suspect_text"/>
+
+        <Button
+            android:id="@+id/report_crime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/crime_report_text"/>
+
+    </LinearLayout>
 
 </LinearLayout>

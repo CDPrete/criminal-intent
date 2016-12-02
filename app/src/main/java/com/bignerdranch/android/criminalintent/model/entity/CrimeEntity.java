@@ -24,6 +24,8 @@ public class CrimeEntity {
 
     private String title;
 
+    private String suspect;
+
     @NotNull private Date date;
 
     @NotNull private boolean solved;
@@ -36,12 +38,13 @@ public class CrimeEntity {
     @Generated(hash = 290012313)
     private transient CrimeEntityDao myDao;
 
-    @Generated(hash = 1130558032)
-    public CrimeEntity(Long id, @NotNull String uuid, String title, @NotNull Date date,
-            boolean solved) {
+    @Generated(hash = 1358391938)
+    public CrimeEntity(Long id, @NotNull String uuid, String title, String suspect,
+            @NotNull Date date, boolean solved) {
         this.id = id;
         this.uuid = uuid;
         this.title = title;
+        this.suspect = suspect;
         this.date = date;
         this.solved = solved;
     }
@@ -132,6 +135,7 @@ public class CrimeEntity {
                 "id=" + id +
                 ", uuid='" + uuid + '\'' +
                 ", title='" + title + '\'' +
+                ", suspect='" + suspect + '\'' +
                 ", date=" + date +
                 ", solved=" + solved +
                 '}';
@@ -139,6 +143,14 @@ public class CrimeEntity {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getSuspect() {
+        return this.suspect;
+    }
+
+    public void setSuspect(String suspect) {
+        this.suspect = suspect;
     }
 
     /** called by internal mechanisms, do not call yourself. */
