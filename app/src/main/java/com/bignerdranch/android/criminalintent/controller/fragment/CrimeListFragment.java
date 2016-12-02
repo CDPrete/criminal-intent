@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import com.bignerdranch.android.criminalintent.R;
@@ -21,7 +22,6 @@ import com.bignerdranch.android.criminalintent.model.Crime;
 import com.bignerdranch.android.criminalintent.model.CrimeLab;
 
 import java.util.List;
-import java.util.UUID;
 
 /**
  * @author Cosimo Damiano Prete
@@ -142,16 +142,13 @@ public class CrimeListFragment extends Fragment {
             itemView.setOnClickListener(this);
 
             mCrimeTitleTextView = (TextView) itemView.findViewById(R.id.list_item_crime_title_text_view);
-            mCrimeIdTextView = (TextView) itemView.findViewById(R.id.list_item_crime_crime_id);
             mCrimeDateTextView = (TextView) itemView.findViewById(R.id.list_item_crime_date_text_view);
             mCrimeSolvedCheckBox = (CheckBox) itemView.findViewById(R.id.list_item_crime_solved_check_box);
-            mCrimeSolvedCheckBox.setOnClickListener(new View.OnClickListener() {
+            mCrimeSolvedCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
-                public void onClick(View view) {
-                    CrimeLab lab = CrimeLab.getInstance(getActivity().getApplication());
-                    Crime crime = lab.getCrime(UUID.fromString(mCrimeIdTextView.getText().toString()));
-                    crime.setSolved(mCrimeSolvedCheckBox.isChecked());
-                    lab.updateCrime(crime);
+                public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                    mCrime.setSolved(checked);
+                    CrimeLab.getInstance(getActivity().getApplication()).updateCrime(mCrime);
                 }
             });
         }
@@ -162,7 +159,6 @@ public class CrimeListFragment extends Fragment {
             mCrimeTitleTextView.setText(mCrime.getTitle());
             mCrimeDateTextView.setText(mCrime.getDate().toString());
             mCrimeSolvedCheckBox.setChecked(mCrime.isSolved());
-            mCrimeIdTextView.setText(mCrime.getId().toString());
         }
 
         @Override
