@@ -8,7 +8,6 @@ import org.greenrobot.greendao.annotation.NotNull;
 import org.greenrobot.greendao.annotation.Unique;
 
 import java.util.Date;
-import java.util.UUID;
 
 /**
  * @author Cosimo Damiano Prete
@@ -21,12 +20,11 @@ public class CrimeEntity {
 
     @NotNull
     @Unique
-    private String uuid = UUID.randomUUID().toString();
+    private String uuid;
 
-    @NotNull private String title;
+    private String title;
 
-    @NotNull
-    private Date date = new Date();
+    @NotNull private Date date;
 
     @NotNull private boolean solved;
 
@@ -38,9 +36,9 @@ public class CrimeEntity {
     @Generated(hash = 290012313)
     private transient CrimeEntityDao myDao;
 
-    @Generated(hash = 528918887)
-    public CrimeEntity(Long id, @NotNull String uuid, @NotNull String title,
-            @NotNull Date date, boolean solved) {
+    @Generated(hash = 1130558032)
+    public CrimeEntity(Long id, @NotNull String uuid, String title, @NotNull Date date,
+            boolean solved) {
         this.id = id;
         this.uuid = uuid;
         this.title = title;
