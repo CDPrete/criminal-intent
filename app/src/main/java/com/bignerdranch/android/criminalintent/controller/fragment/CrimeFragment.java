@@ -55,7 +55,7 @@ public class CrimeFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        CrimeLab lab = CrimeLab.getInstance(getActivity());
+        CrimeLab lab = CrimeLab.getInstance(getActivity().getApplication());
         mCrime = lab.getCrime((UUID)
                 getArguments().getSerializable(ARG_CRIME_ID));
 
@@ -105,6 +105,13 @@ public class CrimeFragment extends Fragment {
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+
+        CrimeLab.getInstance(getActivity().getApplication()).updateCrime(mCrime);
+    }
+
+    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.fragment_crime, menu);
@@ -115,9 +122,9 @@ public class CrimeFragment extends Fragment {
         switch (item.getItemId()) {
             case R.id.delete_crime_menu_item:
                 ConfirmationDialogFragment confirmation = ConfirmationDialogFragment
-                                                                    .newInstance(
-                                                                            R.string.delete_crime,
-                                                                            R.string.delete_crime_confirmation);
+                        .newInstance(
+                                R.string.delete_crime,
+                                R.string.delete_crime_confirmation);
                 confirmation.setTargetFragment(CrimeFragment.this, REQUEST_CRIME_CANCELLATION);
                 confirmation.show(getFragmentManager(), CRIME_CANCELLATION_CONFIRMATION_TAG);
                 return true;
@@ -125,6 +132,7 @@ public class CrimeFragment extends Fragment {
                 return super.onOptionsItemSelected(item);
         }
     }
+
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -136,7 +144,7 @@ public class CrimeFragment extends Fragment {
                     break;
                 case REQUEST_CRIME_CANCELLATION:
                     Activity parent = getActivity();
-                    CrimeLab.getInstance(parent).removeCrime(mCrime);
+                    CrimeLab.getInstance(parent.getApplication()).removeCrime(mCrime);
                     parent.finish();
                     break;
             }

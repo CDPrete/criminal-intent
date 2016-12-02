@@ -32,4 +32,14 @@
         android:padding="4dp"
         tools:text="Crime Date"/>
 
+    <TextView
+        android:id="@+id/list_item_crime_crime_id"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:layout_below="@id/list_item_crime_date_text_view"
+        android:padding="4dp"
+        tools:text="Crime UUID"
+        tools:visibility="visible"/>
+
 </RelativeLayout>

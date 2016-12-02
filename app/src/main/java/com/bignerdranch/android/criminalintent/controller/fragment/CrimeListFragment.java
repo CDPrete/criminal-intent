@@ -21,6 +21,7 @@ import com.bignerdranch.android.criminalintent.model.Crime;
 import com.bignerdranch.android.criminalintent.model.CrimeLab;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @author Cosimo Damiano Prete
@@ -75,7 +76,7 @@ public class CrimeListFragment extends Fragment {
         switch (item.getItemId()) {
             case R.id.menu_item_new_crime:
                 Crime newCrime = new Crime();
-                CrimeLab.getInstance(getActivity()).addCrime(newCrime);
+                CrimeLab.getInstance(getActivity().getApplication()).addCrime(newCrime);
                 startActivity(CrimePagerActivity.newIntent(getActivity(), newCrime.getId()));
                 return true;
             case R.id.menu_item_show_subtitle:
@@ -101,13 +102,14 @@ public class CrimeListFragment extends Fragment {
     }
 
     private void updateUI() {
-        CrimeLab crimeLab = CrimeLab.getInstance(getActivity());
+        CrimeLab crimeLab = CrimeLab.getInstance(getActivity().getApplication());
         List<Crime> crimes = crimeLab.getCrimes();
 
         if(mCrimeAdapter == null) {
             mCrimeAdapter = new CrimeAdapter(crimes);
             mCrimeRecyclerView.setAdapter(mCrimeAdapter);
         } else {
+            mCrimeAdapter.setCrimeList(crimes);
             mCrimeAdapter.notifyDataSetChanged();
         }
 
@@ -119,7 +121,7 @@ public class CrimeListFragment extends Fragment {
         String subtitle =
                 getString(
                         R.string.subtitle_format,
-                        CrimeLab.getInstance(parent).getCrimes().size());
+                        CrimeLab.getInstance(parent.getApplication()).getCrimes().size());
         if(!mIsSubtitleVisible) {
             subtitle = null;
         }
@@ -129,18 +131,29 @@ public class CrimeListFragment extends Fragment {
     private class CrimeHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private TextView mCrimeTitleTextView;
         private TextView mCrimeDateTextView;
+        private TextView mCrimeIdTextView;
         private CheckBox mCrimeSolvedCheckBox;
 
         private Crime mCrime;
 
-        public CrimeHolder(View itemView) {
+        public CrimeHolder(final View itemView) {
             super(itemView);
 
             itemView.setOnClickListener(this);
 
             mCrimeTitleTextView = (TextView) itemView.findViewById(R.id.list_item_crime_title_text_view);
+            mCrimeIdTextView = (TextView) itemView.findViewById(R.id.list_item_crime_crime_id);
             mCrimeDateTextView = (TextView) itemView.findViewById(R.id.list_item_crime_date_text_view);
             mCrimeSolvedCheckBox = (CheckBox) itemView.findViewById(R.id.list_item_crime_solved_check_box);
+            mCrimeSolvedCheckBox.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    CrimeLab lab = CrimeLab.getInstance(getActivity().getApplication());
+                    Crime crime = lab.getCrime(UUID.fromString(mCrimeIdTextView.getText().toString()));
+                    crime.setSolved(mCrimeSolvedCheckBox.isChecked());
+                    lab.updateCrime(crime);
+                }
+            });
         }
 
         public void bindCrime(Crime crime) {
@@ -149,6 +162,7 @@ public class CrimeListFragment extends Fragment {
             mCrimeTitleTextView.setText(mCrime.getTitle());
             mCrimeDateTextView.setText(mCrime.getDate().toString());
             mCrimeSolvedCheckBox.setChecked(mCrime.isSolved());
+            mCrimeIdTextView.setText(mCrime.getId().toString());
         }
 
         @Override
@@ -180,6 +194,10 @@ public class CrimeListFragment extends Fragment {
         @Override
         public int getItemCount() {
             return mCrimes.size();
+        }
+
+        public void setCrimeList(List<Crime> crimes) {
+            mCrimes = crimes;
         }
     }
 }
