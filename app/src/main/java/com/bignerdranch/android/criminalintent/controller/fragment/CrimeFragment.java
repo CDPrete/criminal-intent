@@ -3,6 +3,7 @@ package com.bignerdranch.android.criminalintent.controller.fragment;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -111,17 +112,19 @@ public class CrimeFragment extends Fragment {
             }
         });
 
+        final Intent pickContact = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
         mSuspectButton = (Button) view.findViewById(R.id.choose_crime_suspect);
         mSuspectButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(Intent.ACTION_PICK);
-                i.setData(ContactsContract.Contacts.CONTENT_URI);
-                startActivityForResult(i, REQUEST_CONTACT);
+                startActivityForResult(pickContact, REQUEST_CONTACT);
             }
         });
         if(mCrime.getSuspect() != null && !mCrime.getSuspect().isEmpty()) {
             mSuspectButton.setText(mCrime.getSuspect());
+        }
+        if(getActivity().getPackageManager().resolveActivity(pickContact, PackageManager.MATCH_DEFAULT_ONLY) == null) {
+            mSuspectButton.setEnabled(false);
         }
 
         return view;
