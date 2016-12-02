@@ -3,7 +3,10 @@ package com.bignerdranch.android.criminalintent.controller.fragment;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -32,8 +35,10 @@ public class CrimeFragment extends Fragment {
     private static final String DATE_PICKER_TAG = "crime_date_picker";
 
     private static final int REQUEST_DATE = 0;
+    private static final int REQUEST_CONTACT = 1;
 
     private Button mDateButton;
+    private Button mSuspectButton;
 
     private Crime mCrime;
 
@@ -94,6 +99,31 @@ public class CrimeFragment extends Fragment {
             }
         });
 
+        Button mReportButton = (Button) view.findViewById(R.id.report_crime);
+        mReportButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(Intent.ACTION_SEND);
+                i.setType("text/plain");
+                i.putExtra(Intent.EXTRA_TEXT, getCrimeReport());
+                i.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.crime_report_suspect));
+                startActivity(Intent.createChooser(i, getString(R.string.send_report)));
+            }
+        });
+
+        mSuspectButton = (Button) view.findViewById(R.id.choose_crime_suspect);
+        mSuspectButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(Intent.ACTION_PICK);
+                i.setData(ContactsContract.Contacts.CONTENT_URI);
+                startActivityForResult(i, REQUEST_CONTACT);
+            }
+        });
+        if(mCrime.getSuspect() != null && !mCrime.getSuspect().isEmpty()) {
+            mSuspectButton.setText(mCrime.getSuspect());
+        }
+
         return view;
     }
 
@@ -106,9 +136,28 @@ public class CrimeFragment extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode == REQUEST_DATE && resultCode == Activity.RESULT_OK) {
-            mCrime.setDate(DatePickerFragment.getExtraCrimeDate(data));
-            updateDate();
+        if(resultCode == Activity.RESULT_OK) {
+            switch (requestCode) {
+                case REQUEST_DATE:
+                    mCrime.setDate(DatePickerFragment.getExtraCrimeDate(data));
+                    updateDate();
+                    break;
+                case REQUEST_CONTACT:
+                    if(data != null) {
+                        Uri contactUri = data.getData();
+                        String[] queryFields = {ContactsContract.Contacts.DISPLAY_NAME};
+                        Cursor cursor = getActivity().getContentResolver().query(contactUri, queryFields, null, null, null);
+                        try {
+                            if(cursor.getCount() > 0) {
+                                cursor.moveToFirst();
+                                mCrime.setSuspect(cursor.getString(0));
+                                mSuspectButton.setText(mCrime.getSuspect());
+                            }
+                        } finally {
+                            cursor.close();
+                        }
+                    }
+            }
         }
     }
 
