@@ -1,5 +1,7 @@
 apply plugin: 'com.android.application'
 
+apply plugin: 'org.greenrobot.greendao'
+
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.1"
@@ -29,4 +31,8 @@ dependencies {
     compile 'com.android.support:support-v4:25.0.1'
     compile 'com.android.support:recyclerview-v7:25.0.1'
     testCompile 'junit:junit:4.12'
+
+    compile 'org.greenrobot:greendao:3.2.0'
+    //needed if you want to use an encrypted database with GreenDAO
+    compile 'net.zetetic:android-database-sqlcipher:3.5.4'
 }
