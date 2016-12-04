@@ -6,10 +6,15 @@ import com.bignerdranch.android.criminalintent.App;
 import com.bignerdranch.android.criminalintent.model.entity.CrimeEntity;
 import com.bignerdranch.android.criminalintent.model.entity.CrimeEntityDao;
 import com.bignerdranch.android.criminalintent.model.entity.DaoSession;
+import com.bignerdranch.android.criminalintent.model.entity.SuspectEntity;
+import com.bignerdranch.android.criminalintent.model.entity.SuspectEntityDao;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import static com.bignerdranch.android.criminalintent.model.util.DtoToEntityConverter.toCrimeEntity;
+import static com.bignerdranch.android.criminalintent.model.util.EntityToDtoConverter.toCrime;
 
 /**
  * @author Cosimo Damiano Prete
@@ -20,10 +25,12 @@ public class CrimeLab {
     private static CrimeLab sCrimeLab;
 
     private CrimeEntityDao mCrimeDao;
+    private SuspectEntityDao mSuspectDao;
 
     private CrimeLab(Application context) {
         DaoSession daoSession = ((App) context).getDaoSession();
         mCrimeDao = daoSession.getCrimeEntityDao();
+        mSuspectDao = daoSession.getSuspectEntityDao();
     }
 
     public static CrimeLab getInstance(Application context) {
@@ -56,8 +63,18 @@ public class CrimeLab {
         crimeEntity.setTitle(crime.getTitle());
         crimeEntity.setSolved(crime.isSolved());
 
-        mCrimeDao.update(crimeEntity);
+        updateSuspect(crimeEntity.getSuspect(), crime.getSuspect());
 
+        mCrimeDao.update(crimeEntity);
+    }
+
+    private void updateSuspect(SuspectEntity oldSuspect, Suspect newSuspect) {
+        if(oldSuspect != null && newSuspect != null) {
+            oldSuspect.setPhoneNumber(newSuspect.getNumber());
+            oldSuspect.setSuspect(newSuspect.getName());
+
+            mSuspectDao.update(oldSuspect);
+        }
     }
 
     private CrimeEntity getCrimeEntity(UUID crimeId) {
@@ -65,31 +82,12 @@ public class CrimeLab {
                 .queryBuilder()
                 .where(CrimeEntityDao.Properties.Uuid.eq(crimeId.toString()))
                 .uniqueOrThrow();
-    }
+    }/*
 
-    private Crime toCrime(CrimeEntity crimeEntity) {
-        Crime crime = null;
-        if(crimeEntity != null) {
-            crime = new Crime();
-            crime.setDate(crimeEntity.getDate());
-            crime.setTitle(crimeEntity.getTitle());
-            crime.setId(UUID.fromString(crimeEntity.getUuid()));
-            crime.setSolved(crimeEntity.getSolved());
-            crime.setSuspect(crimeEntity.getSuspect());
-        }
-        return crime;
-    }
-
-    private CrimeEntity toCrimeEntity(Crime crime) {
-        CrimeEntity crimeEntity = null;
-        if(crime != null) {
-            crimeEntity = new CrimeEntity();
-            crimeEntity.setSolved(crime.isSolved());
-            crimeEntity.setTitle(crime.getTitle());
-            crimeEntity.setUuid(crime.getId().toString());
-            crimeEntity.setDate(crime.getDate());
-            crimeEntity.setSuspect(crime.getSuspect());
-        }
-        return crimeEntity;
-    }
+    private Cursor fromBeginning() {
+        return mCrimeDao
+                .queryBuilder()
+                .buildCursor()
+                .query();
+    }*/
 }
