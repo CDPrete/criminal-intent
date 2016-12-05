@@ -8,10 +8,13 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.FileProvider;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,11 +22,15 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 
 import com.bignerdranch.android.criminalintent.R;
 import com.bignerdranch.android.criminalintent.model.Crime;
 import com.bignerdranch.android.criminalintent.model.CrimeLab;
+import com.bignerdranch.android.criminalintent.util.PictureUtils;
 
+import java.io.File;
 import java.util.UUID;
 
 /**
@@ -37,9 +44,14 @@ public class CrimeFragment extends Fragment {
 
     private static final int REQUEST_DATE = 0;
     private static final int REQUEST_CONTACT = 1;
+    private static final int REQUEST_PHOTO = 2;
 
     private Button mDateButton;
     private Button mSuspectButton;
+
+    private ImageView mPhotoView;
+
+    private File mPhotoFile;
 
     private Crime mCrime;
 
@@ -57,8 +69,9 @@ public class CrimeFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mCrime = CrimeLab.getInstance(getActivity().getApplication()).getCrime((UUID)
-                getArguments().getSerializable(ARG_CRIME_ID));
+        CrimeLab lab = CrimeLab.getInstance(getActivity().getApplication());
+        mCrime = lab.getCrime((UUID) getArguments().getSerializable(ARG_CRIME_ID));
+        mPhotoFile = lab.getPhotoFile(mCrime);
     }
 
     @Override
@@ -112,6 +125,21 @@ public class CrimeFragment extends Fragment {
             }
         });
 
+        final Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        final ImageButton mPhotoButton = (ImageButton) view.findViewById(R.id.crime_camera);
+        mPhotoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Uri contentUri = FileProvider.getUriForFile(getActivity(), "com.bignerdranch.android.criminalintent", mPhotoFile);
+                Log.i("ContentURI", contentUri.toString());
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, contentUri);
+                startActivityForResult(takePictureIntent, REQUEST_PHOTO);
+            }
+        });
+
+        mPhotoView = (ImageView) view.findViewById(R.id.crime_photo);
+        updatePhotoView();
+
         final Intent pickContact = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
         mSuspectButton = (Button) view.findViewById(R.id.choose_crime_suspect);
         mSuspectButton.setOnClickListener(new View.OnClickListener() {
@@ -123,8 +151,12 @@ public class CrimeFragment extends Fragment {
         if(mCrime.getSuspect() != null && !mCrime.getSuspect().isEmpty()) {
             mSuspectButton.setText(mCrime.getSuspect());
         }
-        if(getActivity().getPackageManager().resolveActivity(pickContact, PackageManager.MATCH_DEFAULT_ONLY) == null) {
+
+        if(!areAppsToHandleIntentPresent(pickContact)) {
             mSuspectButton.setEnabled(false);
+        }
+        if(!areAppsToHandleIntentPresent(takePictureIntent) || mPhotoFile == null) {
+            mPhotoButton.setEnabled(false);
         }
 
         return view;
@@ -160,8 +192,18 @@ public class CrimeFragment extends Fragment {
                             cursor.close();
                         }
                     }
+                    break;
+                case REQUEST_PHOTO:
+                    updatePhotoView();
+                    break;
             }
         }
+    }
+
+    private boolean areAppsToHandleIntentPresent(Intent intent) {
+        return getActivity()
+                .getPackageManager()
+                .resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY) != null;
     }
 
     private void updateDate() {
@@ -182,5 +224,14 @@ public class CrimeFragment extends Fragment {
         }
 
         return getString(R.string.crime_report, mCrime.getTitle(), dateString, solvedString, suspect);
+    }
+
+    private void updatePhotoView() {
+        if(mPhotoFile == null && !mPhotoFile.exists()) {
+            mPhotoView.setImageDrawable(null);
+        } else {
+            mPhotoView.setImageBitmap(
+                    PictureUtils.getScaledBitmap(mPhotoFile.getPath(), getActivity()));
+        }
     }
 }

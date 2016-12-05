@@ -1,12 +1,15 @@
 package com.bignerdranch.android.criminalintent.model;
 
 import android.app.Application;
+import android.content.Context;
+import android.os.Environment;
 
 import com.bignerdranch.android.criminalintent.App;
 import com.bignerdranch.android.criminalintent.model.entity.CrimeEntity;
 import com.bignerdranch.android.criminalintent.model.entity.CrimeEntityDao;
 import com.bignerdranch.android.criminalintent.model.entity.DaoSession;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -20,10 +23,12 @@ public class CrimeLab {
     private static CrimeLab sCrimeLab;
 
     private CrimeEntityDao mCrimeDao;
+    private Context mContext;
 
     private CrimeLab(Application context) {
         DaoSession daoSession = ((App) context).getDaoSession();
         mCrimeDao = daoSession.getCrimeEntityDao();
+        mContext = context;
     }
 
     public static CrimeLab getInstance(Application context) {
@@ -58,6 +63,15 @@ public class CrimeLab {
 
         mCrimeDao.update(crimeEntity);
 
+    }
+
+    public File getPhotoFile(Crime crime) {
+        File externalFilesDir = mContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File photoFile = null;
+        if(externalFilesDir != null) {
+            photoFile = new File(externalFilesDir, crime.getPhotoFilename());
+        }
+        return photoFile;
     }
 
     private CrimeEntity getCrimeEntity(UUID crimeId) {
