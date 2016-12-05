@@ -40,6 +40,7 @@ import java.util.UUID;
 public class CrimeFragment extends Fragment {
     private static final String ARG_CRIME_ID = "crime_id";
     private static final String DATE_PICKER_TAG = "crime_date_picker";
+    private static final String PHOTO_SHOWER_TAG = "crime_photo_shower";
 
     private static final int REQUEST_DATE = 0;
     private static final int REQUEST_CONTACT = 1;
@@ -137,6 +138,14 @@ public class CrimeFragment extends Fragment {
         });
 
         mPhotoView = (ImageView) view.findViewById(R.id.crime_photo);
+        mPhotoView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                PhotoShowerFragment
+                        .newInstance(mPhotoFile.getPath())
+                        .show(getFragmentManager(), PHOTO_SHOWER_TAG);
+            }
+        });
         updatePhotoView();
 
         final Intent pickContact = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
@@ -232,5 +241,6 @@ public class CrimeFragment extends Fragment {
             mPhotoView.setImageBitmap(
                     PictureUtils.getScaledBitmap(mPhotoFile.getPath(), getActivity()));
         }
+        mPhotoView.setEnabled(mPhotoView.getDrawable() != null);
     }
 }
