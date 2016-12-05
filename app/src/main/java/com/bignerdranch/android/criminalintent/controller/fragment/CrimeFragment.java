@@ -14,7 +14,6 @@ import android.support.v4.content.FileProvider;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -131,7 +130,7 @@ public class CrimeFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 Uri contentUri = FileProvider.getUriForFile(getActivity(), "com.bignerdranch.android.criminalintent", mPhotoFile);
-                Log.i("ContentURI", contentUri.toString());
+
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, contentUri);
                 startActivityForResult(takePictureIntent, REQUEST_PHOTO);
             }
@@ -227,7 +226,7 @@ public class CrimeFragment extends Fragment {
     }
 
     private void updatePhotoView() {
-        if(mPhotoFile == null && !mPhotoFile.exists()) {
+        if(mPhotoFile == null || !mPhotoFile.exists()) {
             mPhotoView.setImageDrawable(null);
         } else {
             mPhotoView.setImageBitmap(
